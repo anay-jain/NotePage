@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +38,8 @@ public class Settings extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         googleSignInHandler = new GoogleSignInHandler(this);
 
         SignInButton signInButton = (SignInButton)findViewById(R.id.sign_in_button);
@@ -53,6 +58,22 @@ public class Settings extends AppCompatActivity{
             ((CardView)findViewById(R.id.profile_card_view)).setVisibility(View.GONE);
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                break;
+        }
+        return true;
     }
 
     @Override

@@ -68,7 +68,7 @@ public class Database extends SQLiteOpenHelper{
             title_id -> integer foreign key
             message -> string
         */
-        sql = "CREATE TABLE IF NOT EXISTS Notes (id integer primary key autoincrement, title_id int, message text);";
+        sql = "CREATE TABLE IF NOT EXISTS Notes (id integer primary key autoincrement, title_id int, message text, completed int default 0);";
         database.execSQL(sql);
 
     }
@@ -137,7 +137,7 @@ public class Database extends SQLiteOpenHelper{
         SQLiteDatabase database = this.getReadableDatabase();
         List<Title> list = new ArrayList<>();
 
-        String sql = "select Titles.id, title, max(Notes.id), message From Titles Left Join Notes on Titles.id = Notes.title_id group by Titles.id having title like ?%      order by Titles.id;";
+        String sql = "select Titles.id, title, max(Notes.id), message From Titles Left Join Notes on Titles.id = Notes.title_id group by Titles.id having title like ? || '%' order by Titles.id;";
         Cursor resultSet = database.rawQuery(sql, new String[] {query});
 
         while (resultSet.moveToNext()){
@@ -159,20 +159,63 @@ public class Database extends SQLiteOpenHelper{
         return title;
     }
 
+    //method to chenge title
+    public void editTitle(int id, String title){
+        SQLiteDatabase database = this.getWritableDatabase();
+        String sql = "update Titles set title = ? where id = " + id;
+        database.rawQuery(sql, new String[]{title});
+    }
+
     //method to get all the notes based on title id
     public List<Note> getNotes(int title_id){
         SQLiteDatabase database = this.getReadableDatabase();
         List<Note> list = new ArrayList<>();
 
-        String sql = "SELECT id, message FROM Notes WHERE title_id = " + title_id;
+        String sql = "SELECT id, message, completed FROM Notes WHERE title_id = " + title_id;
         Cursor resultSet = database.rawQuery(sql, null);
 
         while (resultSet.moveToNext()){
-            list.add(new Note(resultSet.getString(1), resultSet.getInt(0)));
+            list.add(new Note(resultSet.getString(1), resultSet.getInt(0), resultSet.getInt(2)));
             Log.e("jatin", "added note" + resultSet.getString(1));
         }
 
         return list;
+    }
+
+    //method to get completed notes
+    public List<Note> getUnCompletedNotes(int title_id){
+        SQLiteDatabase database = this.getReadableDatabase();
+        List<Note> list = new ArrayList<>();
+
+        String sql = "SELECT id, message, completed FROM Notes WHERE completed=0 and title_id = " + title_id;
+        Cursor resultSet = database.rawQuery(sql, null);
+
+        while (resultSet.moveToNext()){
+            list.add(new Note(resultSet.getString(1), resultSet.getInt(0), resultSet.getInt(2)));
+            Log.e("jatin", "added note" + resultSet.getString(1));
+        }
+
+        return list;
+    }
+
+    //method to get a single not
+    public Note getNote(int id){
+        Note note;
+
+        SQLiteDatabase database = this.getReadableDatabase();
+        String sql = "select message, id, completed from Notes where id = " + id;
+        Cursor resultSet = database.rawQuery(sql, null);
+        resultSet.moveToFirst();
+        note = new Note(resultSet.getString(0),resultSet.getInt(1), resultSet.getInt(2));
+
+        return note;
+    }
+
+    public void setNoteComplete(int id, boolean complete){
+        SQLiteDatabase database = this.getWritableDatabase();
+        String sql = "Update Notes set completed = " + (complete?1:0) + " where id = " + id;
+        database.execSQL(sql);
+        Log.e("jatin", "changed to "+complete);
     }
 
     public boolean delTitle(int id) {

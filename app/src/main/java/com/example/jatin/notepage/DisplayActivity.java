@@ -8,6 +8,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +23,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -94,6 +96,9 @@ public class DisplayActivity extends AppCompatActivity {
 
     public void updateList(){
         List<Note> messages = db.getNotes(title_id);
+        updateList(messages);
+    }
+    public void updateList(List<Note> messages){
         displayListAdapter= new DisplayListAdapter(messages);
         recyclerView.setAdapter(displayListAdapter);
     }
@@ -138,6 +143,16 @@ public class DisplayActivity extends AppCompatActivity {
                         .setNegativeButton(android.R.string.no, null)
                         .show();
                 break;
+            case R.id.all:
+                item.setVisible(false);
+                menu.findItem(R.id.incomplete).setVisible(true);
+                updateList();
+                break;
+            case R.id.incomplete:
+                item.setVisible(false);
+                menu.findItem(R.id.all).setVisible(true);
+                updateList(db.getUnCompletedNotes(title_id));
+                break;
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
                 break;
@@ -169,17 +184,19 @@ public class DisplayActivity extends AppCompatActivity {
 
         private boolean selectionMode = false;
         private List<Note> selected = new ArrayList<>();
-        private List<LinearLayout> cards = new ArrayList<>();
+        private List<RelativeLayout> cards = new ArrayList<>();
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public TextView message;
-            public LinearLayout cardLayout;
+            public RelativeLayout cardLayout;
+            public CheckBox checkBox;
 
             public ViewHolder(View itemView) {
                 super(itemView);
                 message = (TextView)itemView.findViewById(R.id.message);
-                cardLayout = (LinearLayout) itemView.findViewById(R.id.card_layout);
+                cardLayout = (RelativeLayout) itemView.findViewById(R.id.card_layout);
                 cards.add(cardLayout);
+                checkBox = (CheckBox) itemView.findViewById(R.id.complete);
             }
         }
 
@@ -245,6 +262,9 @@ public class DisplayActivity extends AppCompatActivity {
                     }
                 }
             });
+            if (messages.get(position).getCompleted()){
+                holder.checkBox.setChecked(true);
+            }
             holder.cardLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -256,6 +276,13 @@ public class DisplayActivity extends AppCompatActivity {
                     } else {
                         return false;
                     }
+                }
+            });
+
+            holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    db.setNoteComplete(messages.get(position).getId(), b);
                 }
             });
         }

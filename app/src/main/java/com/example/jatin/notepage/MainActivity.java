@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.design.widget.FloatingActionButton;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -39,13 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private MainListAdapter mainListAdapter;
     private Database db;
     private Menu menu;
-    SearchManager searchmanager;
-    SearchView searchview;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private SearchManager searchmanager ;
+    private SearchView searchview;
+    private MenuItem searchItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //setting up recycler view
-        recyclerView = (RecyclerView) findViewById(R.id.list_recycler);
+        recyclerView = (RecyclerView)findViewById(R.id.list_recycler);
 
         mainListAdapter = new MainListAdapter(titles);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -72,12 +69,37 @@ public class MainActivity extends AppCompatActivity {
 
         //updating list
 //        mainListAdapter.notifyDataSetChanged();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        FloatingActionButton addButton = (FloatingActionButton)findViewById(R.id.add);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Dialog dialog = new Dialog(MainActivity.this, R.style.DialogTheme);
+                dialog.setContentView(R.layout.add_popup_layout);
+                Button add = (Button)dialog.findViewById(R.id.add);
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String title = ((EditText) dialog.findViewById(R.id.title)).getText().toString();
+                        title.trim();
+                        if (!title.equals("") && title.length() < 200){
+                            db.addTitle(title);
+                            updateList();
+                            dialog.dismiss();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Invalid Title", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                dialog.show();
+            }
+        });
+
+
     }
 
-    public void updateList() {
+    public void updateList(){
         titles = db.getTitles();
 //        Log.e("jatin", titles.get(0).getTitle());
 
@@ -87,27 +109,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onStart() {
-        super.onStart();// ATTENTION: This was auto-generated to implement the App Indexing API.
-// See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        updateList();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
 
     @Override
-    public boolean onSearchRequested() {
+    protected void onStart() {
+        super.onStart();
+        updateList();
+        if (searchItem != null)
+            searchItem.collapseActionView();
+    }
+    @Override
+    public boolean onSearchRequested(){
         //pauseSomeStuff();
         return super.onSearchRequested();
     }
 
 
+
     @Override
     public void onBackPressed() {
-        if (mainListAdapter.isSelectionMode()) {
+        if (mainListAdapter.isSelectionMode()){
             mainListAdapter.onBackPress();
         } else {
             super.onBackPressed();
@@ -119,14 +139,14 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
         this.menu = menu;
         // set the search view and the searchable menu config
-        searchmanager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchview = (SearchView) menu.findItem(R.id.search).getActionView();
+         searchmanager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+         searchview =(SearchView) menu.findItem(R.id.search).getActionView();
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        switch (item.getItemId()){
             case R.id.delete:
 
                 new AlertDialog.Builder(this)
@@ -138,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 List<Title> selected = mainListAdapter.getSelectedTitles();
                                 int size = selected.size();
-                                for (int j = 0; j < size; j++) {
+                                for (int j=0; j<size; j++){
                                     db.delTitle(selected.get(j).getId());
                                 }
                                 mainListAdapter.clearSelection();
@@ -171,30 +191,30 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
                 break;
             case R.id.settings:
-                Intent settingdisplay = new Intent(MainActivity.this, Settings.class);
+                Intent settingdisplay = new Intent(MainActivity.this , Settings.class);
                 startActivity(settingdisplay);
                 break;
-            case R.id.edit_title
+            case R.id.edit_title:
                 final Dialog edit_dialog = new Dialog(this , R.style.DialogTheme);
-                    dialog.setContentView(R.layout.edit_popup_layout);
-                    Button edit_button = (Button) dialog.findViewById(R.id.edit_button);
+                    edit_dialog.setContentView(R.layout.edit_popup_layout);
+                    Button edit_button = (Button) edit_dialog.findViewById(R.id.edit_button);
                     edit_button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String title = ((EditText) dialog.findViewById(R.id.edit_title)).getText().toString();
+                            String title = ((EditText) edit_dialog.findViewById(R.id.edit_title)).getText().toString();
                             title.trim();
                             int titleid = mainListAdapter.getSelectedTitles().get(0).getId();
                             if(title !="" && title.length() < 20){
                               db.editTitle(titleid ,title);
                                 updateList();
-                                dialog.dismiss();
+                                edit_dialog.dismiss();
                             }
                             else
                                 Toast.makeText(MainActivity.this , "Invalid title" , Toast.LENGTH_SHORT).show();
 
                         }
                     });
-
+                    edit_dialog.show();
 
                         break;
 
@@ -230,39 +250,13 @@ public class MainActivity extends AppCompatActivity {
         onStart();
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Main Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
-    }
-
     //Adapter for the list
     public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHolder> {
 
         private List<Title> titles;
 
         private boolean selectionMode = false;
-        private List<Title> selected = new ArrayList<>();
+        private List<Title> selected= new ArrayList<>();
         private List<LinearLayout> layouts = new ArrayList<>();
 
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -296,38 +290,38 @@ public class MainActivity extends AppCompatActivity {
             MenuItem delete = MainActivity.this.menu.findItem(R.id.delete);
             MenuItem edit = MainActivity.this.menu.findItem(R.id.edit_title);
             if (mode) {
-                if (selected.size()==1) edit.setVisible(true);
-                else edit.setVisible(false);
+                edit.setVisible(true);
                 delete.setVisible(true);
             } else {
                 delete.setVisible(false);
+                edit.setVisible(false);
             }
         }
 
-        public void onBackPress() {
+        public void onBackPress(){
             //clear all the selection when back is pressed
             clearSelection();
             int size = layouts.size();
-            for (int i = 0; i < size; i++) {
+            for (int i=0; i<size; i++){
                 layouts.get(i).setBackgroundColor(Color.parseColor("#FFFFFF"));
             }
             setSelectionMode(false);
         }
 
         //constructor
-        public MainListAdapter(List<Title> titles) {
+        public MainListAdapter(List<Title> titles){
             this.titles = titles;
         }
 
         // Implemented methods
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MainListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.main_list_layout, parent, false);
             return new ViewHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
+        public void onBindViewHolder(final MainListAdapter.ViewHolder holder, int position) {
             final Title title = titles.get(position);
             holder.title.setText(title.getTitle());
             holder.data.setText(title.getLatestMessage());
@@ -335,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
             holder.list_item.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    if (selected.contains(title)) {
+                    if (selected.contains(title)){
                         return false;
                     } else {
                         setSelectionMode(true);
@@ -348,17 +342,17 @@ public class MainActivity extends AppCompatActivity {
             holder.list_item.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (selectionMode) {
-                        if (selected.contains(title)) {
+                    if (selectionMode){
+                        if (selected.contains(title)){
                             selected.remove(title);
                             holder.list_item.setBackgroundColor(Color.parseColor("#FFFFFF"));
-                            if (selected.size() == 0) setSelectionMode(false);
+                            if(selected.size() == 0) setSelectionMode(false);
                         } else {
                             holder.list_item.setBackgroundColor(Color.parseColor("#FFC8F482"));
                             selected.add(title);
                         }
                     } else {
-                        Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
+                        Intent intent = new Intent (MainActivity.this, DisplayActivity.class);
                         intent.putExtra("title_id", title.getId());
                         startActivity(intent);
                     }

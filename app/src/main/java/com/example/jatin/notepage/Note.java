@@ -4,6 +4,7 @@ public class Note {
 
     private int id;
     private String message;
+    private boolean completed;
 
     Note(){}
 
@@ -11,9 +12,10 @@ public class Note {
         this.message = message;
     }
 
-    Note(String message, int id){
+    Note(String message, int id, int completed){
         this.id = id;
         this.message = message;
+        this.completed = completed!=0;
     }
 
     //getter methods
@@ -23,6 +25,9 @@ public class Note {
     public int getId(){
         return this.id;
     }
+    public boolean getCompleted(){
+        return this.completed;
+    }
 
     //setter methods
     public void setMessage(String message){
@@ -30,6 +35,9 @@ public class Note {
     }
     public void setId(int id){
         this.id = id;
+    }
+    public void setCompleted(boolean completed){
+        this.completed = completed;
     }
 
 }
