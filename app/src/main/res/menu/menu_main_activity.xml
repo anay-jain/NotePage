@@ -2,8 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/delete" android:icon="@android:drawable/ic_menu_delete" android:title="Delete" android:visible="false" app:showAsAction="always"/>
-    <item android:id="@+id/add" android:icon="@android:drawable/ic_menu_add" android:title="Add" app:showAsAction="always"/>
-    <item android:id="@+id/search"  android:icon="@android:drawable/ic_menu_search" android:title="search" app:showAsAction="always"/>
+    <item android:id="@+id/search"  android:icon="@android:drawable/ic_menu_search" android:title="search" app:showAsAction="collapseActionView|always" app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item android:id="@+id/settings" android:icon="@android:drawable/ic_menu_manage" android:title="settings" app:showAsAction="always"/>
-    <item android:id="@+id/search_bar" android:icon="@android:drawable/editbox_background"  android:title="search_bar" android:visible="false" app:showAsAction="always"/>
+    <item android:id="@+id/edit_title" android:icon="@android:drawable/ic_menu_edit" android:title="Edit" android:visible="false"  app:showAsAction="always"></item>
 </menu>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
@@ -189,6 +190,7 @@ public class Database extends SQLiteOpenHelper{
 
         }
     }
+
 
     public boolean delNote(int id){
         SQLiteDatabase database = this.getWritableDatabase();

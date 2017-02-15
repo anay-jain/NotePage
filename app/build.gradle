@@ -34,4 +34,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.0'
     androidTestCompile 'com.android.support.test:testing-support-lib:0.1'
+    compile 'com.google.android.gms:play-services-appindexing:9.0.0'
 }
