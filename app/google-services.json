@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "357599174264",
+    "project_id": "notepage-158709"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:357599174264:android:c8648b2fbfde57b3",
+        "android_client_info": {
+          "package_name": "com.example.jatin.notepage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "357599174264-aaen8h3ifmbfj6ugn80fro9rcs36464n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jatin.notepage",
+            "certificate_hash": "1EF262B699C07A57977CE34D5706F8BABFD66C87"
+          }
+        },
+        {
+          "client_id": "357599174264-cngm5gsm408jl1vkcsulb9pems5d245l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5pGBRlrnASIPghVOr51OzRaQSCFXX9ng"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+}
+  ],
+  "configuration_version": "1"
+}
