@@ -58,7 +58,7 @@ public class DisplayActivity extends AppCompatActivity {
         //if there is no such id move back to previous activity
         if (title_id == -1) this.finish();
 
-        //populating the messages according to note_id
+        //populating the messages according to ->  note_id
         recyclerView = (RecyclerView)findViewById(R.id.list_recycler);
         displayListAdapter = new DisplayListAdapter(messages);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
