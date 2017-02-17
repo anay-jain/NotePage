@@ -211,6 +211,20 @@ public class Database extends SQLiteOpenHelper{
         return note;
     }
 
+    public List<Note> getNote(String query, int title_id){
+        SQLiteDatabase database = this.getReadableDatabase();
+        List<Note> list = new ArrayList<>();
+
+        String sql = "select message, id, completed from Notes where title_id = ? and message like ? || '%';";
+        Cursor resultSet = database.rawQuery(sql, new String[] {""+title_id, query});
+
+        while (resultSet.moveToNext()){
+            list.add(new Note(resultSet.getString(0), resultSet.getInt(1), resultSet.getInt(2)));
+        }
+
+        return list;
+    }
+
     public void setNoteComplete(int id, boolean complete){
         SQLiteDatabase database = this.getWritableDatabase();
         String sql = "Update Notes set completed = " + (complete?1:0) + " where id = " + id;

@@ -1,5 +1,7 @@
 package com.example.jatin.notepage;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.os.Handler;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,6 +41,8 @@ public class DisplayActivity extends AppCompatActivity {
     private Menu menu;
     private Database db;
     private int title_id;
+    private SearchManager searchmanager;
+    private SearchView searchview;
 
 
     @Override
@@ -116,6 +121,9 @@ public class DisplayActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_display_activity, menu);
         this.menu = menu;
+        searchmanager = (SearchManager)  getSystemService(Context.SEARCH_SERVICE);
+        searchview = (SearchView) menu.findItem(R.id.display_search).getActionView();
+
         return true;
     }
 
@@ -156,7 +164,29 @@ public class DisplayActivity extends AppCompatActivity {
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
                 break;
-        }
+            case R.id.display_search:
+                 menu.findItem(R.id.incomplete).setVisible(false);
+                 menu.findItem(R.id.all).setVisible(false);
+                 searchview.setSearchableInfo(searchmanager.getSearchableInfo(getComponentName()));
+                 searchview.setIconifiedByDefault(false);
+                 searchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                     @Override
+                     public boolean onQueryTextSubmit(String query) {
+                         Toast.makeText(DisplayActivity.this, "hello", Toast.LENGTH_SHORT).show();
+                         return false;
+                     }
+
+                     @Override
+                     public boolean onQueryTextChange(String newText) {
+                         messages = db.getNote(newText, title_id);
+                         displayListAdapter = new DisplayListAdapter(messages);
+                         recyclerView.setAdapter(displayListAdapter);
+
+
+                         return true;
+                     }
+                 });
+            }
         return true;
     }
 
